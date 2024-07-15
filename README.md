@@ -1,12 +1,9 @@
-# realsense_ROS2_interface
+# usbcam_ROS2_interface
 
-This ROS2 package interfaces robots and/or joysticks with the official Intel RealSense ROS wrapper.
-
+This ROS2 package interfaces robots and/or joysticks with a USB webcam
 While it's targeting Intel RealSense and Sony Playstation Joystick, the package can be easily modified to work with any USB camera and controller.
 
 For any questions, please contact the author, [Irving Fang](https://irvingf7.github.io/).
-
-This package is heavily influenced and inspired by a [similar ROS1 package](https://github.com/ripl/capture-images) written by [Dr. Takuma Yoneda](https://takuma.yoneda.xyz/) from TTIC.
 
 ## Setup
 This package is only tested on `Ubuntu 22.04` and `ROS humble` distribution.
