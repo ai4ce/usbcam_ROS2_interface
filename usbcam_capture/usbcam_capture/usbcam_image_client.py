@@ -1,6 +1,7 @@
 from usbcam_interface_msg.srv import TakeImage
 
 from sensor_msgs.msg import Joy
+from sensor_msgs.msg import Image
 
 from queue import Queue
 import os
@@ -10,8 +11,6 @@ from cv_bridge import CvBridge
 
 import rclpy
 from rclpy.node import Node
-
-
 
 class USBCamImageClient(Node):
 
@@ -40,6 +39,13 @@ class USBCamImageClient(Node):
         
         
         self.image_req = TakeImage.Request()
+
+
+        ############################ Publisher Setup ##########################################
+        self.image_publisher = self.create_publisher(
+            msg_type=Image, 
+            topic='/usbcam_capture/captured_rgb_image', 
+            qos_profile=10)
 
         ############################ Subscriber Setup #########################################
         # subscribe to joy topic to read joystick button press
@@ -72,6 +78,10 @@ class USBCamImageClient(Node):
         color_reset = '\033[0m'
 
         self.get_logger().info(f'{color_start}image saved{color_reset}')
+
+        # publish the captured image
+        self.image_publisher.publish(img)
+
         return encoded_img
 
     def _debounce_setup(self):

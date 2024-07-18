@@ -73,7 +73,7 @@ def generate_launch_description():
         parameters=[{'save_folder': save_folder_path}],
     )
     ld.add_action(foxglove_launch)
-    ld.add_action(joy_launch)
+    # ld.add_action(joy_launch)
     ld.add_action(usbcam_image_server_launch)
     ld.add_action(usbcam_image_client_launch)
 
