@@ -26,6 +26,7 @@ setup(
         'console_scripts': [
             'usbcam_image_server = usbcam_capture.usbcam_image_server:main',
             'usbcam_image_client = usbcam_capture.usbcam_image_client:main',
+            'usbcam_static_tf_publisher = usbcam_capture.usbcam_static_tf_publisher:main',
         ],
     },
 )

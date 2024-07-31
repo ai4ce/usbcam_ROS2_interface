@@ -1,5 +1,6 @@
 
 import os
+import usb
 import yaml
 
 from launch import LaunchDescription
@@ -72,9 +73,17 @@ def generate_launch_description():
         name='usbcam_image_client',
         parameters=[{'save_folder': save_folder_path}],
     )
+
+    usb_cam_static_tf_publisher_launch = Node(
+        package='usbcam_capture',
+        executable='usbcam_static_tf_publisher',
+        name='usbcam_static_tf_publisher',
+    )
+
     ld.add_action(foxglove_launch)
     # ld.add_action(joy_launch)
     ld.add_action(usbcam_image_server_launch)
     ld.add_action(usbcam_image_client_launch)
+    ld.add_action(usb_cam_static_tf_publisher_launch)
 
     return ld
