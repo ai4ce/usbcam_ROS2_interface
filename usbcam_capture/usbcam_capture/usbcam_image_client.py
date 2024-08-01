@@ -165,9 +165,9 @@ class USBCamImageClient(Node):
             self.json_dict['p2'] = config['p2']
             self.json_dict['camera_model'] = 'OPENCV'
             self.json_dict['frames'] = list()
-            # self.json_dict['applied_transform'] = np.array([[1.0, 0.0, 0.0, 0.0],
-            #                                                 [0.0, 1.0, 0.0, 0.0],
-            #                                                 [0.0, 0.0, 1.0, 0.0]]).tolist()
+            self.json_dict['applied_transform'] = np.array([[1.0, 0.0, 0.0, 0.0],
+                                                            [0.0, 1.0, 0.0, 0.0],
+                                                            [0.0, 0.0, 1.0, 0.0]], dtype=np.float64).tolist()
 
     def _json_update(self):
         '''
