@@ -22,6 +22,7 @@ def declare_arguments():
     return LaunchDescription(
         [
             DeclareLaunchArgument("save_folder", default_value="/home/irving/Desktop", description="What folder to save the images to"),
+            DeclareLaunchArgument("json_path", default_value="/home/irving/Desktop/usb_transform.json", description="Path to the logging json file. If empty, no logging will be done"),
         ]
     )
 
@@ -40,6 +41,8 @@ def load_yaml(package_name, file_name):
 def generate_launch_description():
 
     save_folder_path = LaunchConfiguration("save_folder")
+    json_path = LaunchConfiguration("json_path")
+    calibration_path = os.path.join(get_package_share_directory('realsense_capture'), 'config', 'calibration.yaml')
 
     ld = LaunchDescription()
     ld.add_entity(declare_arguments())
@@ -71,7 +74,9 @@ def generate_launch_description():
         package='usbcam_capture',
         executable='usbcam_image_client',
         name='usbcam_image_client',
-        parameters=[{'save_folder': save_folder_path}],
+        parameters=[{'save_folder': save_folder_path, 
+                     'json_path': json_path,
+                     'calibration_path': calibration_path}],
     )
 
     usb_cam_static_tf_publisher_launch = Node(
