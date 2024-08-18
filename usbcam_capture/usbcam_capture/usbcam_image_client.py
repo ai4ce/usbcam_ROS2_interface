@@ -101,39 +101,34 @@ class USBCamImageClient(Node):
         encoded_img = self.cvbridge.imgmsg_to_cv2(img_msg=img, 
                                                   desired_encoding='passthrough')
 
-        # color the log message in blue
-        color_start = '\033[94m'
-        color_reset = '\033[0m'
-
-        # save the image
-        if self.save_folder != '':
-            self.get_logger().info(f'{color_start}image saved{color_reset}')
-            cv2.imwrite(os.path.join(self.rgb_save_folder, f'{self.image_count}.png'), encoded_img)
-        else:
-            self.get_logger().info(f'{color_start}image captured, not saved{color_reset}')
+        # save the image to disk
+        self._log_image(encoded_img)
 
         
         # publish the captured image
         self.image_publisher.publish(img)
 
         # update the json dict
-        if self.json_path != '':
-            self._json_update()
-
-            # overwrite the JSON file if there is one. Not sure if this is the best way to do it
-            # potentially we can just keep the json_dict in memory and dump it at the end of the program
-            # but this is a good way to keep the json file updated in case the program cannot exit as expected
-            with open(self.json_path, 'wt') as f:
-                json.dump(self.json_dict, f)
-            
-            # color the log message in green
-            color_start = '\033[92m'
-            color_reset = '\033[0m'
-            self.get_logger().info(f'{color_start}JSON file updated{color_reset}')
+        self._json_update()
 
         self.image_count += 1
 
         return encoded_img
+    
+    def _log_image(self, img):
+        '''
+        Save the image to disk
+        '''
+        # color the save log message in blue
+        save_color_start = '\033[94m'
+        save_color_reset = '\033[0m'
+
+        if self.save_folder != '':
+            cv2.imwrite(os.path.join(self.rgb_save_folder, f'{self.image_count}.png'), img)
+            np.save(os.path.join(self.rgb_save_folder, f'{self.image_count}.npy'), img)
+            self.get_logger().info(f'{save_color_start}image saved{save_color_reset}')
+        else:
+            self.get_logger().info(f'{save_color_start}image captured, not saved{save_color_reset}')
 
     def _debounce_setup(self):
         '''
@@ -170,6 +165,21 @@ class USBCamImageClient(Node):
                                                             [0.0, 0.0, 1.0, 0.0]], dtype=np.float64).tolist()
 
     def _json_update(self):
+
+        # color the json log message in green
+        json_color_start = '\033[92m'
+        json_color_reset = '\033[0m'
+
+        if self.json_path != '':
+            self._json_update_helper()
+            # overwrite the JSON file if there is one. Not sure if this is the best way to do it
+            # potentially we can just keep the json_dict in memory and dump it at the end of the program
+            # but this is a good way to keep the json file updated in case the program cannot exit as expected
+            with open(self.json_path, 'wt') as f:
+                json.dump(self.json_dict, f)
+            self.get_logger().info(f'{json_color_start}JSON file updated{json_color_reset}')
+
+    def _json_update_helper(self):
         '''
         Update the json dict with the latest transform
         '''
@@ -177,15 +187,16 @@ class USBCamImageClient(Node):
         
         # get the coordinate of the camera in the base frame
         transformstamp = self.tf_buffer.lookup_transform(target_frame='link_base', 
-                                            source_frame='link_camera', 
+                                            source_frame='link_realsense', 
                                             time=Time(), 
                                             timeout=Duration(seconds=2))
         transformation_matrix = self._process_tf(transformstamp)
 
 
-        update_dict['file_path'] = os.path.join('rgb', f'{self.image_count}.png')
+        update_dict['file_path'] = os.path.join('rgb', f'rgb_{self.image_count}.png')
         update_dict['transformation_matrix'] = transformation_matrix.tolist()
         update_dict['colmap_im_id'] = self.image_count
+        update_dict['depth_file_path'] = os.path.join('depth', f'depth_{self.image_count}.png')
 
         self.json_dict['frames'].append(update_dict)
         
